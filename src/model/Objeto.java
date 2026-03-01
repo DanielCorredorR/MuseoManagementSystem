@@ -1,9 +1,10 @@
 package model;
-import java.time.LocalDate;
+
 public class Objeto extends ObraArte {
 
-    public Objeto(String autor, String periodo, double valorEconomico,
-                  LocalDate fechaCreacion, LocalDate fechaIngresoMuseo) {
-        super(autor, periodo, valorEconomico, fechaCreacion, fechaIngresoMuseo);
+    public Objeto(String titulo, String autor,
+                  int anioCreacion, double valorEconomico) {
+
+        super(titulo, autor, anioCreacion, valorEconomico);
     }
 }

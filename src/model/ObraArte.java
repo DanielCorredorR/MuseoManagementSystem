@@ -5,95 +5,56 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class ObraArte {
+public class ObraArte {
 
-    private final String id;
+    private String id;
+    private String titulo;
     private String autor;
-    private String periodo;
-    private double valorEconomico;
-    private LocalDate fechaCreacion;
-    private LocalDate fechaIngresoMuseo;
-    private EstadoObra estado;
     private int anioCreacion;
+    private double valorEconomico;
+    private EstadoObra estado;
     private LocalDate fechaUltimaRestauracion;
-
     private List<Restauracion> restauraciones;
-    private List<Cesion> cesiones;
 
-    public ObraArte(String autor, String periodo, double valorEconomico,
-                    LocalDate fechaCreacion, LocalDate fechaIngresoMuseo) {
+    public ObraArte(String titulo, String autor,
+                    int anioCreacion, double valorEconomico) {
+
         this.id = UUID.randomUUID().toString();
+        this.titulo = titulo;
         this.autor = autor;
-        this.periodo = periodo;
+        this.anioCreacion = anioCreacion;
         this.valorEconomico = valorEconomico;
-        this.fechaCreacion = fechaCreacion;
-        this.fechaIngresoMuseo = fechaIngresoMuseo;
-        this.estado = EstadoObra.EXPUESTA;
+        this.estado = EstadoObra.EXHIBICION;
         this.restauraciones = new ArrayList<>();
-        this.cesiones = new ArrayList<>();
     }
+
+    public void addRestauracion(Restauracion restauracion) {
+        restauraciones.add(restauracion);
+    }
+
+    // getters y setters necesarios
 
     public String getId() {
         return id;
     }
 
-    public String getAutor() {
-        return autor;
-    }
-
-    public String getPeriodo() {
-        return periodo;
+    public int getAnioCreacion() {
+        return anioCreacion;
     }
 
     public double getValorEconomico() {
         return valorEconomico;
     }
 
-    public LocalDate getFechaCreacion() {
-        return fechaCreacion;
+    public LocalDate getFechaUltimaRestauracion() {
+        return fechaUltimaRestauracion;
     }
 
-    public LocalDate getFechaIngresoMuseo() {
-        return fechaIngresoMuseo;
-    }
-
-    public EstadoObra getEstado() {
-        return estado;
+    public void setFechaUltimaRestauracion(LocalDate fecha) {
+        this.fechaUltimaRestauracion = fecha;
     }
 
     public void setEstado(EstadoObra estado) {
         this.estado = estado;
     }
-
-    public List<Restauracion> getRestauraciones() {
-        return List.copyOf(restauraciones);
-    }
-
-    public List<Cesion> getCesiones() {
-        return List.copyOf(cesiones);
-    }
-
-    public void addRestauracion(Restauracion restauracion) {
-        this.restauraciones.add(restauracion);
-    }
-
-    public void addCesion(Cesion cesion) {
-        this.cesiones.add(cesion);
-    }
-    public int getAnioCreacion() {
-        return anioCreacion;
-    }
-
-    public void setAnioCreacion(int anioCreacion) {
-        this.anioCreacion = anioCreacion;
-    }
-
-    public LocalDate getFechaUltimaRestauracion() {
-        return fechaUltimaRestauracion;
-    }
-
-    public void setFechaUltimaRestauracion(LocalDate fechaUltimaRestauracion) {
-        this.fechaUltimaRestauracion = fechaUltimaRestauracion;
-    }
-    
 }

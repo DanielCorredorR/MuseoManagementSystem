@@ -1,14 +1,15 @@
 package model;
-import java.time.LocalDate;
+
 public class Cuadro extends ObraArte {
 
     private String estilo;
     private String tecnica;
 
-    public Cuadro(String autor, String periodo, double valorEconomico,
-                  LocalDate fechaCreacion, LocalDate fechaIngresoMuseo,
+    public Cuadro(String titulo, String autor,
+                  int anioCreacion, double valorEconomico,
                   String estilo, String tecnica) {
-        super(autor, periodo, valorEconomico, fechaCreacion, fechaIngresoMuseo);
+
+        super(titulo, autor, anioCreacion, valorEconomico);
         this.estilo = estilo;
         this.tecnica = tecnica;
     }

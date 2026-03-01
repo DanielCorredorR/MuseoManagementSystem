@@ -1,14 +1,15 @@
 package model;
-import java.time.LocalDate;
+
 public class Escultura extends ObraArte {
 
     private String estilo;
     private String material;
 
-    public Escultura(String autor, String periodo, double valorEconomico,
-                     LocalDate fechaCreacion, LocalDate fechaIngresoMuseo,
+    public Escultura(String titulo, String autor,
+                     int anioCreacion, double valorEconomico,
                      String estilo, String material) {
-        super(autor, periodo, valorEconomico, fechaCreacion, fechaIngresoMuseo);
+
+        super(titulo, autor, anioCreacion, valorEconomico);
         this.estilo = estilo;
         this.material = material;
     }
