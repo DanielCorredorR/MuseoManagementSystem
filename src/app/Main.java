@@ -1,13 +1,22 @@
-package app;
+package main;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Scanner;
-import model.Rol;
+
+import model.Museo;
+import model.ObraArte;
 import model.Usuario;
+
+import repository.UsuarioRepository;
 import repository.ObraRepository;
 import repository.RestauracionRepository;
-import repository.UsuarioRepository;
+import repository.MuseoRepository;
+import repository.CesionRepository;
+
 import service.AuthService;
 import service.ObraService;
+import service.CesionService;
 
 public class Main {
 
@@ -15,139 +24,149 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
+        // =========================
+        // REPOSITORIES
+        // =========================
         UsuarioRepository usuarioRepository = new UsuarioRepository();
         ObraRepository obraRepository = new ObraRepository();
         RestauracionRepository restauracionRepository = new RestauracionRepository();
+        MuseoRepository museoRepository = new MuseoRepository();
+        CesionRepository cesionRepository = new CesionRepository();
 
+        // =========================
+        // SERVICES
+        // =========================
         AuthService authService = new AuthService(usuarioRepository);
-        ObraService obraService = new ObraService(obraRepository, restauracionRepository);
+        ObraService obraService =
+                new ObraService(obraRepository, restauracionRepository);
+        CesionService cesionService =
+                new CesionService(cesionRepository, obraRepository);
 
-        boolean sistemaActivo = true;
+        // =========================
+        // LOGIN
+        // =========================
+        System.out.println("===== SISTEMA MUSEO =====");
+        System.out.println("=== LOGIN ===");
 
-        while (sistemaActivo) {
+        System.out.print("Usuario: ");
+        String username = scanner.nextLine();
 
-            System.out.println("\n===== SISTEMA MUSEO =====");
-            System.out.println("1. Iniciar Sesion");
-            System.out.println("0. Salir");
+        System.out.print("Password: ");
+        String password = scanner.nextLine();
 
-            int opcionInicio = Integer.parseInt(scanner.nextLine());
+        Usuario usuario = authService.login(username, password);
 
-            if (opcionInicio == 0) {
-                sistemaActivo = false;
-                continue;
-            }
+        if (usuario == null) {
+            System.out.println("Credenciales incorrectas");
+            return;
+        }
 
-            if (opcionInicio != 1) {
-                continue;
-            }
+        System.out.println("Bienvenido " + usuario.getRol());
 
-            Usuario usuarioLogueado = null;
+        // =========================
+        // MENU DIRECTOR
+        // =========================
+        if (usuario.getRol().equals("DIRECTOR")) {
 
-            while (usuarioLogueado == null) {
+            boolean salir = false;
 
-                System.out.println("\n=== LOGIN ===");
+            while (!salir) {
 
-                System.out.print("Usuario: ");
-                String username = scanner.nextLine();
+                System.out.println("\n=== MENU DIRECTOR ===");
+                System.out.println("1. Registrar museo");
+                System.out.println("2. Listar museos");
+                System.out.println("3. Ceder obra");
+                System.out.println("4. Ver cesiones por obra");
+                System.out.println("5. Ver valor total museo");
+                System.out.println("0. Salir");
 
-                System.out.print("Password: ");
-                String password = scanner.nextLine();
-
-                usuarioLogueado = authService.login(username, password);
-
-                if (usuarioLogueado == null) {
-                    System.out.println("Credenciales incorrectas. Intente nuevamente.");
-                }
-            }
-
-            System.out.println("Bienvenido " + usuarioLogueado.getRol());
-
-            boolean sesionActiva = true;
-
-            while (sesionActiva) {
-
-                System.out.println("\n===== MENU PRINCIPAL =====");
-
-                switch (usuarioLogueado.getRol()) {
-
-                    case DIRECTOR:
-                        System.out.println("1. Ver valor total del museo");
-                        System.out.println("9. Cerrar Sesion");
-                        break;
-
-                    case RESTAURADOR:
-                        System.out.println("1. Ejecutar restauraciones automaticas");
-                        System.out.println("9. Cerrar Sesion");
-                        break;
-
-                    case CATALOGADOR:
-                        System.out.println("1. Registrar obra");
-                        System.out.println("9. Cerrar Sesion");
-                        break;
-
-                    case VISITANTE:
-                        System.out.println("1. Mensaje de bienvenida");
-                        System.out.println("9. Cerrar Sesion");
-                        break;
-                }
-
+                System.out.print("Seleccione opcion: ");
                 int opcion = Integer.parseInt(scanner.nextLine());
 
-                if (opcion == 9) {
-                    sesionActiva = false;
-                    System.out.println("Sesion cerrada.");
-                    continue;
-                }
+                switch (opcion) {
 
-                switch (usuarioLogueado.getRol()) {
+                    case 1:
+                        System.out.print("Nombre museo: ");
+                        String nombre = scanner.nextLine();
 
-                    case DIRECTOR:
-                        if (opcion == 1) {
-                            double total = obraService.calcularValorTotalMuseo();
-                            System.out.println("Valor total del museo: " + total);
+                        System.out.print("Ciudad: ");
+                        String ciudad = scanner.nextLine();
+
+                        Museo museo = new Museo(nombre, ciudad);
+                        museoRepository.save(museo);
+
+                        System.out.println("Museo registrado");
+                        break;
+
+                    case 2:
+                        List<Museo> museos = museoRepository.findAll();
+
+                        for (Museo m : museos) {
+                            System.out.println(m.getId() + " - " + m);
                         }
                         break;
 
-                    case RESTAURADOR:
-                        if (opcion == 1) {
-                            obraService.verificarRestauracionesAutomaticas();
-                            System.out.println("Proceso ejecutado.");
+                    case 3:
+                        System.out.print("ID Obra: ");
+                        String idObra = scanner.nextLine();
+
+                        System.out.print("ID Museo destino: ");
+                        String idMuseo = scanner.nextLine();
+
+                        Museo museoDestino = museoRepository.findById(idMuseo);
+
+                        if (museoDestino == null) {
+                            System.out.println("Museo no encontrado");
+                            break;
                         }
+
+                        System.out.print("Importe: ");
+                        double importe = Double.parseDouble(scanner.nextLine());
+
+                        System.out.print("Fecha inicio (YYYY-MM-DD): ");
+                        LocalDate inicio =
+                                LocalDate.parse(scanner.nextLine());
+
+                        System.out.print("Fecha fin (YYYY-MM-DD): ");
+                        LocalDate fin =
+                                LocalDate.parse(scanner.nextLine());
+
+                        cesionService.cederObra(
+                                idObra,
+                                museoDestino,
+                                importe,
+                                inicio,
+                                fin
+                        );
+
+                        System.out.println("Cesion registrada");
                         break;
 
-                    case CATALOGADOR:
-                        if (opcion == 1) {
+                    case 4:
+                        System.out.print("ID Obra: ");
+                        String id = scanner.nextLine();
 
-                            System.out.print("Titulo: ");
-                            String titulo = scanner.nextLine();
-
-                            System.out.print("Autor: ");
-                            String autor = scanner.nextLine();
-
-                            System.out.print("Anio creacion: ");
-                            int anio = Integer.parseInt(scanner.nextLine());
-
-                            System.out.print("Valor economico: ");
-                            double valor = Double.parseDouble(scanner.nextLine());
-
-                            model.ObraArte obra =
-                                    new model.ObraArte(titulo, autor, anio, valor);
-
-                            obraService.registrarObra(obra);
-
-                            System.out.println("Obra registrada correctamente.");
-                        }
+                        cesionRepository.findByObraId(id)
+                                .forEach(System.out::println);
                         break;
 
-                    case VISITANTE:
-                        if (opcion == 1) {
-                            System.out.println("Bienvenido al museo.");
-                        }
+                    case 5:
+                        double total =
+                                obraService.calcularValorTotalMuseo();
+
+                        System.out.println("Valor total museo: $" + total);
                         break;
+
+                    case 0:
+                        salir = true;
+                        break;
+
+                    default:
+                        System.out.println("Opcion invalida");
                 }
             }
         }
 
-        System.out.println("Sistema finalizado.");
+        System.out.println("Sistema finalizado");
     }
 }
