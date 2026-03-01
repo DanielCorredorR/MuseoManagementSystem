@@ -17,19 +17,17 @@ public class ObraRepository {
     }
 
     public List<ObraArte> findAll() {
-        return new ArrayList<>(obras);
+        return obras;
     }
 
     public ObraArte findById(String id) {
+
         for (ObraArte obra : obras) {
             if (obra.getId().equals(id)) {
                 return obra;
             }
         }
-        return null;
-    }
 
-    public void delete(String id) {
-        obras.removeIf(obra -> obra.getId().equals(id));
+        return null;
     }
 }

@@ -17,6 +17,6 @@ public class RestauracionRepository {
     }
 
     public List<Restauracion> findAll() {
-        return new ArrayList<>(restauraciones);
+        return restauraciones;
     }
 }

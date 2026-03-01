@@ -1,9 +1,10 @@
 package app;
 
+import service.ObraService;
 import java.util.Scanner;
 import repository.ObraRepository;
 import repository.RestauracionRepository;
-import service.ObraService;
+import model.ObraArte;
 
 public class Main {
 
@@ -31,8 +32,27 @@ public class Main {
             switch (opcion) {
 
                 case 1:
-                    // luego lo implementamos
+                    scanner.nextLine(); // limpiar buffer
+
+                    System.out.print("Titulo: ");
+                    String titulo = scanner.nextLine();
+
+                    System.out.print("Autor: ");
+                    String autor = scanner.nextLine();
+
+                    System.out.print("Anio de creacion: ");
+                    int anio = scanner.nextInt();
+
+                    System.out.print("Valor economico: ");
+                    double valor = scanner.nextDouble();
+
+                    ObraArte obra = new ObraArte(titulo, autor, anio, valor);
+
+                    obraService.registrarObra(obra);
+
+                    System.out.println("Obra registrada correctamente.");
                     break;
+                    
 
                 case 2:
                     double total = obraService.calcularValorTotalMuseo();

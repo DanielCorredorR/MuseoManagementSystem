@@ -1,8 +1,7 @@
 package model;
 
 public enum EstadoObra {
-    EXPUESTA,
-    EN_RESTAURACION,
-    CEDIDA,
-    EXHIBICION
+
+    EXHIBICION,
+    EN_RESTAURACION
 }
