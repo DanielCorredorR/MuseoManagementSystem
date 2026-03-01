@@ -1,77 +1,131 @@
 package app;
 
-import service.ObraService;
 import java.util.Scanner;
+import model.Rol;
+import model.Usuario;
 import repository.ObraRepository;
 import repository.RestauracionRepository;
-import model.ObraArte;
+import repository.UsuarioRepository;
+import service.AuthService;
+import service.ObraService;
 
 public class Main {
 
     public static void main(String[] args) {
 
+        Scanner scanner = new Scanner(System.in);
+
+        // ===== REPOSITORIES =====
+        UsuarioRepository usuarioRepository = new UsuarioRepository();
         ObraRepository obraRepository = new ObraRepository();
         RestauracionRepository restauracionRepository = new RestauracionRepository();
 
-        ObraService obraService =
-                new ObraService(obraRepository, restauracionRepository);
+        // ===== SERVICES =====
+        AuthService authService = new AuthService(usuarioRepository);
+        ObraService obraService = new ObraService(obraRepository, restauracionRepository);
 
-        Scanner scanner = new Scanner(System.in);
-        int opcion;
+        // ===== LOGIN =====
+        System.out.println("===== SISTEMA MUSEO =====");
+        System.out.println("=== LOGIN ===");
 
-        do {
-            System.out.println("\n=== MUSEO MANAGEMENT SYSTEM ===");
-            System.out.println("1. Registrar obra");
-            System.out.println("2. Calcular valor total del museo");
-            System.out.println("3. Verificar restauraciones automaticas");
-            System.out.println("4. Salir");
-            System.out.print("Seleccione una opcion: ");
+        System.out.print("Usuario: ");
+        String username = scanner.nextLine();
 
-            opcion = scanner.nextInt();
+        System.out.print("Password: ");
+        String password = scanner.nextLine();
 
-            switch (opcion) {
+        Usuario usuario = authService.login(username, password);
 
-                case 1:
-                    scanner.nextLine(); // limpiar buffer
+        if (usuario == null) {
+            System.out.println("Credenciales incorrectas");
+            return;
+        }
 
-                    System.out.print("Titulo: ");
-                    String titulo = scanner.nextLine();
+        System.out.println("Bienvenido " + usuario.getRol());
 
-                    System.out.print("Autor: ");
-                    String autor = scanner.nextLine();
+        // ===== MENU SEGUN ROL =====
+        boolean salir = false;
 
-                    System.out.print("Anio de creacion: ");
-                    int anio = scanner.nextInt();
+        while (!salir) {
 
-                    System.out.print("Valor economico: ");
-                    double valor = scanner.nextDouble();
+            System.out.println("\n===== MENU PRINCIPAL =====");
 
-                    ObraArte obra = new ObraArte(titulo, autor, anio, valor);
+            switch (usuario.getRol()) {
 
-                    obraService.registrarObra(obra);
+                case DIRECTOR:
+                    System.out.println("1. Ver valor total del museo");
+                    System.out.println("0. Salir");
 
-                    System.out.println("Obra registrada correctamente.");
-                    break;
-                    
+                    int opcionDirector = Integer.parseInt(scanner.nextLine());
 
-                case 2:
-                    double total = obraService.calcularValorTotalMuseo();
-                    System.out.println("Valor total del museo: " + total);
-                    break;
-
-                case 3:
-                    obraService.verificarRestauracionesAutomaticas();
-                    System.out.println("Verificacion completada.");
+                    if (opcionDirector == 1) {
+                        double total = obraService.calcularValorTotalMuseo();
+                        System.out.println("Valor total del museo: " + total);
+                    } else if (opcionDirector == 0) {
+                        salir = true;
+                    }
                     break;
 
-                case 4:
-                    System.out.println("Saliendo...");
+                case RESTAURADOR:
+                    System.out.println("1. Verificar restauraciones automaticas");
+                    System.out.println("0. Salir");
+
+                    int opcionRestaurador = Integer.parseInt(scanner.nextLine());
+
+                    if (opcionRestaurador == 1) {
+                        obraService.verificarRestauracionesAutomaticas();
+                        System.out.println("Proceso ejecutado.");
+                    } else if (opcionRestaurador == 0) {
+                        salir = true;
+                    }
                     break;
 
-                default:
-                    System.out.println("Opcion invalida.");
+                case CATALOGADOR:
+                    System.out.println("1. Registrar obra");
+                    System.out.println("0. Salir");
+
+                    int opcionCatalogador = Integer.parseInt(scanner.nextLine());
+
+                    if (opcionCatalogador == 1) {
+
+                        System.out.print("Titulo: ");
+                        String titulo = scanner.nextLine();
+
+                        System.out.print("Autor: ");
+                        String autor = scanner.nextLine();
+
+                        System.out.print("Anio creacion: ");
+                        int anio = Integer.parseInt(scanner.nextLine());
+
+                        System.out.print("Valor economico: ");
+                        double valor = Double.parseDouble(scanner.nextLine());
+
+                        model.ObraArte obra =
+                                new model.ObraArte(titulo, autor, anio, valor);
+
+                        obraService.registrarObra(obra);
+
+                        System.out.println("Obra registrada correctamente.");
+                    } else if (opcionCatalogador == 0) {
+                        salir = true;
+                    }
+                    break;
+
+                case VISITANTE:
+                    System.out.println("1. Ver mensaje de bienvenida");
+                    System.out.println("0. Salir");
+
+                    int opcionVisitante = Integer.parseInt(scanner.nextLine());
+
+                    if (opcionVisitante == 1) {
+                        System.out.println("Bienvenido al museo.");
+                    } else if (opcionVisitante == 0) {
+                        salir = true;
+                    }
+                    break;
             }
+        }
 
-        } while (opcion != 4);
+        System.out.println("Sesion finalizada.");
     }
 }
