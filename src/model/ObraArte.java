@@ -14,6 +14,8 @@ public abstract class ObraArte {
     private LocalDate fechaCreacion;
     private LocalDate fechaIngresoMuseo;
     private EstadoObra estado;
+    private int anioCreacion;
+    private LocalDate fechaUltimaRestauracion;
 
     private List<Restauracion> restauraciones;
     private List<Cesion> cesiones;
@@ -78,4 +80,20 @@ public abstract class ObraArte {
     public void addCesion(Cesion cesion) {
         this.cesiones.add(cesion);
     }
+    public int getAnioCreacion() {
+        return anioCreacion;
+    }
+
+    public void setAnioCreacion(int anioCreacion) {
+        this.anioCreacion = anioCreacion;
+    }
+
+    public LocalDate getFechaUltimaRestauracion() {
+        return fechaUltimaRestauracion;
+    }
+
+    public void setFechaUltimaRestauracion(LocalDate fechaUltimaRestauracion) {
+        this.fechaUltimaRestauracion = fechaUltimaRestauracion;
+    }
+    
 }
