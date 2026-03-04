@@ -26,7 +26,7 @@ public class CesionService {
                           LocalDate inicio,
                           LocalDate fin) {
 
-        ObraArte obra = obraRepository.findById(idObra);
+        ObraArte obra = obraRepository.buscarPorId(idObra);
 
         if (obra == null) {
             return;

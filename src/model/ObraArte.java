@@ -2,111 +2,91 @@ package model;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-public class ObraArte {
+public abstract class ObraArte {
 
     private String id;
     private String titulo;
     private String autor;
-    private int anioCreacion;
-    private double valorEconomico;
+    private String periodo;
+    private double valor;
+    private LocalDate fechaCreacion;
+    private LocalDate fechaEntrada;
     private EstadoObra estado;
-    private LocalDate fechaUltimaRestauracion;
     private List<Restauracion> restauraciones;
-
-    public ObraArte(String titulo, String autor,
-                    int anioCreacion, double valorEconomico) {
+    private Sala sala;
+    public ObraArte(String titulo, String autor, String periodo,
+                     double valor, LocalDate fechaCreacion, LocalDate fechaEntrada) {
 
         this.id = UUID.randomUUID().toString();
         this.titulo = titulo;
         this.autor = autor;
-        this.anioCreacion = anioCreacion;
-        this.valorEconomico = valorEconomico;
-        this.estado = EstadoObra.EXHIBICION;
+        this.periodo = periodo;
+        this.valor = valor;
+        this.fechaCreacion = fechaCreacion;
+        this.fechaEntrada = fechaEntrada;
+        this.estado = EstadoObra.EXPUESTA;
         this.restauraciones = new ArrayList<>();
     }
-
-    // ==============================
-    // METODOS DE RESTAURACION
-    // ==============================
-
-    public void enviarARestauracion(String tipo) {
-
-        if (estado == EstadoObra.EN_RESTAURACION) {
-            return;
-        }
-
-        Restauracion restauracion =
-                new Restauracion(tipo, LocalDate.now());
-
-        restauraciones.add(restauracion);
-        estado = EstadoObra.EN_RESTAURACION;
-    }
-
-    public void finalizarRestauracion() {
-
-        if (estado != EstadoObra.EN_RESTAURACION) {
-            return;
-        }
-
-        if (restauraciones.isEmpty()) {
-            return;
-        }
-
-        Restauracion ultima =
-                restauraciones.get(restauraciones.size() - 1);
-
-        ultima.finalizarRestauracion(LocalDate.now());
-
-        fechaUltimaRestauracion = LocalDate.now();
-        estado = EstadoObra.EXHIBICION;
-    }
-
-    public List<Restauracion> getRestauracionesOrdenadas() {
-
-        restauraciones.sort(
-                Comparator.comparing(Restauracion::getFechaInicio)
-        );
-
-        return restauraciones;
-    }
-
-    // ==============================
-    // GETTERS Y SETTERS
-    // ==============================
 
     public String getId() {
         return id;
     }
 
-    public int getAnioCreacion() {
-        return anioCreacion;
+    public String getTitulo() {
+        return titulo;
     }
 
-    public double getValorEconomico() {
-        return valorEconomico;
+    public String getAutor() {
+        return autor;
     }
 
-    public LocalDate getFechaUltimaRestauracion() {
-        return fechaUltimaRestauracion;
+    public String getPeriodo() {
+        return periodo;
     }
 
-    public void setFechaUltimaRestauracion(LocalDate fecha) {
-        this.fechaUltimaRestauracion = fecha;
+    public double getValor() {
+        return valor;
+    }
+
+    public LocalDate getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public LocalDate getFechaEntrada() {
+        return fechaEntrada;
     }
 
     public EstadoObra getEstado() {
         return estado;
     }
+    public Sala getSala() {
+    return sala;
+    }
 
+    public void setSala(Sala sala) {
+    this.sala = sala;
+    }
     public void setEstado(EstadoObra estado) {
         this.estado = estado;
     }
 
-    public void addRestauracion(Restauracion restauracion) {
+    public List<Restauracion> getRestauraciones() {
+        return restauraciones;
+    }
+
+    public void agregarRestauracion(Restauracion restauracion) {
         restauraciones.add(restauracion);
+    }
+
+    @Override
+    public String toString() {
+        return "ID: " + id +
+                " | Titulo: " + titulo +
+                " | Autor: " + autor +
+                " | Estado: " + estado +
+                " | Valor: $" + valor;
     }
 }

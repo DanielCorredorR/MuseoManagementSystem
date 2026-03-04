@@ -1,33 +1,31 @@
 package repository;
 
+import model.ObraArte;
 import java.util.ArrayList;
 import java.util.List;
-import model.ObraArte;
 
 public class ObraRepository {
 
-    private final List<ObraArte> obras;
+    private List<ObraArte> obras;
 
     public ObraRepository() {
         this.obras = new ArrayList<>();
     }
 
-    public void save(ObraArte obra) {
+    public void guardar(ObraArte obra) {
         obras.add(obra);
     }
 
-    public List<ObraArte> findAll() {
+    public List<ObraArte> listarTodas() {
         return obras;
     }
 
-    public ObraArte findById(String id) {
-
+    public ObraArte buscarPorId(String id) {
         for (ObraArte obra : obras) {
             if (obra.getId().equals(id)) {
                 return obra;
             }
         }
-
         return null;
     }
 }

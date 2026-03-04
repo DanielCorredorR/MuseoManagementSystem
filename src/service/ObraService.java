@@ -1,76 +1,50 @@
 package service;
 
-import java.time.LocalDate;
-import java.util.List;
-import model.EstadoObra;
 import model.ObraArte;
-import model.Restauracion;
 import repository.ObraRepository;
 import repository.RestauracionRepository;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class ObraService {
 
-    private final ObraRepository obraRepository;
-    private final RestauracionRepository restauracionRepository;
+    private ObraRepository obraRepository;
+    private RestauracionRepository restauracionRepository;
 
     public ObraService(ObraRepository obraRepository,
                        RestauracionRepository restauracionRepository) {
+
         this.obraRepository = obraRepository;
         this.restauracionRepository = restauracionRepository;
     }
 
     public void registrarObra(ObraArte obra) {
-        obraRepository.save(obra);
+        obraRepository.guardar(obra);
+    }
+
+    public List<ObraArte> listarTodas() {
+        return obraRepository.listarTodas();
+    }
+
+    public ObraArte buscarPorId(String id) {
+        return obraRepository.buscarPorId(id);
     }
 
     public double calcularValorTotalMuseo() {
-        double total = 0;
-        List<ObraArte> obras = obraRepository.findAll();
-        for (ObraArte obra : obras) {
-            total += obra.getValorEconomico();
-        }
-        return total;
+        return obraRepository.listarTodas()
+                .stream()
+                .mapToDouble(ObraArte::getValor)
+                .sum();
     }
 
-    public void enviarARestauracionPorDanio(String idObra, String tipo) {
-        ObraArte obra = obraRepository.findById(idObra);
+    // NECESARIO PARA MENU VISITANTE
+    public List<ObraArte> listarPorSala(String idSala) {
 
-        if (obra == null) {
-            return;
-        }
-
-        Restauracion restauracion =
-                new Restauracion(tipo, LocalDate.now());
-
-        obra.setEstado(EstadoObra.EN_RESTAURACION);
-        obra.addRestauracion(restauracion);
-        restauracionRepository.save(restauracion);
+        return obraRepository.listarTodas()
+                .stream()
+                .filter(o -> o.getSala() != null &&
+                        o.getSala().getId().equals(idSala))
+                .collect(Collectors.toList());
     }
-    public void verificarRestauracionesAutomaticas() {
-    List<ObraArte> obras = obraRepository.findAll();
-    int anioActual = LocalDate.now().getYear();
-
-    for (ObraArte obra : obras) {
-
-        int anioReferencia;
-
-        if (obra.getFechaUltimaRestauracion() != null) {
-            anioReferencia = obra.getFechaUltimaRestauracion().getYear();
-        } else {
-            anioReferencia = obra.getAnioCreacion();
-        }
-
-        if (anioActual - anioReferencia >= 5) {
-
-            Restauracion restauracion =
-                    new Restauracion("PREVENTIVA", LocalDate.now());
-
-            obra.setEstado(EstadoObra.EN_RESTAURACION);
-            obra.setFechaUltimaRestauracion(LocalDate.now());
-            obra.addRestauracion(restauracion);
-
-            restauracionRepository.save(restauracion);
-        }
-    }
-}
 }
