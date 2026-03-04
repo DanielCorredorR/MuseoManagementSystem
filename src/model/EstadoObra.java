@@ -3,5 +3,7 @@ package model;
 public enum EstadoObra {
 
     EXHIBICION,
-    EN_RESTAURACION
+    EN_RESTAURACION,
+    CEDIDA,
+    EXPUESTA
 }
