@@ -7,9 +7,7 @@ public class Escultura extends ObraArte {
     private String estilo;
     private String material;
 
-    public Escultura(String titulo, String autor, String periodo,
-                     double valor, LocalDate fechaCreacion, LocalDate fechaEntrada,
-                     String estilo, String material) {
+    public Escultura(String titulo, String autor, String periodo, double valor, LocalDate fechaCreacion, LocalDate fechaEntrada, String estilo, String material1) {
 
         super(titulo, autor, periodo, valor, fechaCreacion, fechaEntrada);
         this.estilo = estilo;

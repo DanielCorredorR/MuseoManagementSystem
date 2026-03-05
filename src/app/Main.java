@@ -8,7 +8,6 @@ import model.Museo;
 import model.ObraArte;
 import model.Usuario;
 import model.Sala;
-import model.Rol;
 
 import repository.UsuarioRepository;
 import repository.ObraRepository;
@@ -21,7 +20,6 @@ import service.AuthService;
 import service.ObraService;
 import service.CesionService;
 import service.RestauracionService;
-import service.SalaService;
 
 public class Main {
 
@@ -53,11 +51,8 @@ public class Main {
         RestauracionService restauracionService =
                 new RestauracionService(obraRepository);
 
-        SalaService salaService =
-                new SalaService(salaRepository, obraRepository);
-
         // =========================
-        // DATOS INICIALES (SALAS)
+        // SALAS INICIALES
         // =========================
         Sala sala1 = new Sala("Sala Renacimiento", "Obras siglo XV");
         Sala sala2 = new Sala("Sala Moderna", "Obras siglo XX");
@@ -66,54 +61,82 @@ public class Main {
         salaRepository.save(sala2);
 
         // =========================
-        // LOGIN
+        // MENSAJE INICIAL
         // =========================
-        System.out.println("===== SISTEMA MUSEO =====");
-        System.out.println("=== LOGIN ===");
+        System.out.println("=================================");
+        System.out.println(" SISTEMA DE GESTION DEL MUSEO ");
+        System.out.println(" Todos los valores se manejan en USD");
+        System.out.println(" Las fechas deben ingresarse en formato YYYY-MM-DD");
+        System.out.println("=================================");
 
-        System.out.print("Usuario: ");
-        String username = scanner.nextLine();
+        boolean sistemaActivo = true;
 
-        System.out.print("Password: ");
-        String password = scanner.nextLine();
+        while (sistemaActivo) {
 
-        Usuario usuario = authService.login(username, password);
+            System.out.println("\n===== SISTEMA MUSEO =====");
+            System.out.println("1. Iniciar sesion");
+            System.out.println("0. Salir del sistema");
 
-        if (usuario == null) {
-            System.out.println("Credenciales incorrectas");
-            return;
+            System.out.print("Seleccione opcion: ");
+            int opcionSistema = Integer.parseInt(scanner.nextLine());
+
+            if (opcionSistema == 0) {
+                sistemaActivo = false;
+                break;
+            }
+
+            if (opcionSistema == 1) {
+
+                System.out.println("\n=== LOGIN ===");
+
+                System.out.print("Usuario: ");
+                String username = scanner.nextLine();
+
+                System.out.print("Password: ");
+                String password = scanner.nextLine();
+
+                Usuario usuario = authService.login(username, password);
+
+                if (usuario == null) {
+                    System.out.println("Credenciales incorrectas");
+                    continue;
+                }
+
+                System.out.println("Bienvenido " + usuario.getRol());
+
+                // restauraciones automaticas cada vez que entra al sistema
+                restauracionService.verificarRestauracionesAutomaticas();
+
+                switch (usuario.getRol()) {
+
+                    case DIRECTOR:
+                        menuDirector(scanner, museoRepository,
+                                cesionService, cesionRepository, obraService);
+                        break;
+
+                    case VISITANTE:
+                        menuVisitante(scanner, salaRepository, obraService);
+                        break;
+
+                    case RESTAURADOR:
+                        menuRestaurador(scanner, restauracionService);
+                        break;
+
+                    case CATALOGADOR:
+                        menuCatalogador(scanner, obraService, salaRepository);
+                        break;
+
+                    default:
+                        System.out.println("Rol no reconocido");
+                }
+            }
         }
 
-        System.out.println("Bienvenido " + usuario.getRol());
-
-        switch (usuario.getRol()) {
-
-            case DIRECTOR:
-                menuDirector(scanner, museoRepository, cesionService,
-                        cesionRepository, obraService);
-                break;
-
-            case VISITANTE:
-                menuVisitante(scanner, salaRepository, salaService);
-                break;
-
-            case RESTAURADOR:
-                menuRestaurador(scanner, restauracionService);
-                break;
-
-            case CATALOGADOR:
-                System.out.println("Menu catalogador pendiente de implementar");
-                break;
-
-            default:
-                System.out.println("Rol no reconocido");
-        }
-
-        System.out.println("Sistema finalizado");
+        System.out.println("Sistema cerrado correctamente");
     }
 
     // ==========================================================
-    // ======================= MENU DIRECTOR =====================
+    // MENU DIRECTOR
     // ==========================================================
     private static void menuDirector(Scanner scanner,
                                      MuseoRepository museoRepository,
@@ -131,29 +154,35 @@ public class Main {
             System.out.println("3. Ceder obra");
             System.out.println("4. Ver cesiones por obra");
             System.out.println("5. Ver valor total museo");
-            System.out.println("0. Salir");
+            System.out.println("0. Volver");
 
             int opcion = Integer.parseInt(scanner.nextLine());
 
             switch (opcion) {
 
                 case 1:
+
                     System.out.print("Nombre museo: ");
                     String nombre = scanner.nextLine();
 
                     System.out.print("Ciudad: ");
                     String ciudad = scanner.nextLine();
 
-                    museoRepository.save(new Museo(nombre, ciudad));
-                    System.out.println("Museo registrado");
+                    Museo museo = new Museo(nombre, ciudad);
+                    museoRepository.save(museo);
+
+                    System.out.println("Museo registrado con ID: " + museo.getId());
                     break;
 
                 case 2:
+
                     museoRepository.findAll()
                             .forEach(System.out::println);
+
                     break;
 
                 case 3:
+
                     System.out.print("ID Obra: ");
                     String idObra = scanner.nextLine();
 
@@ -167,17 +196,14 @@ public class Main {
                         break;
                     }
 
-                    System.out.print("Importe: ");
-                    double importe =
-                            Double.parseDouble(scanner.nextLine());
+                    System.out.print("Importe de cesion (USD): ");
+                    double importe = Double.parseDouble(scanner.nextLine());
 
                     System.out.print("Fecha inicio (YYYY-MM-DD): ");
-                    LocalDate inicio =
-                            LocalDate.parse(scanner.nextLine());
+                    LocalDate inicio = LocalDate.parse(scanner.nextLine());
 
                     System.out.print("Fecha fin (YYYY-MM-DD): ");
-                    LocalDate fin =
-                            LocalDate.parse(scanner.nextLine());
+                    LocalDate fin = LocalDate.parse(scanner.nextLine());
 
                     cesionService.cederObra(
                             idObra,
@@ -191,18 +217,21 @@ public class Main {
                     break;
 
                 case 4:
+
                     System.out.print("ID Obra: ");
                     String id = scanner.nextLine();
 
                     cesionRepository.findByObraId(id)
                             .forEach(System.out::println);
+
                     break;
 
                 case 5:
+
                     double total =
                             obraService.calcularValorTotalMuseo();
 
-                    System.out.println("Valor total museo: $" + total);
+                    System.out.println("Valor total museo (USD): $" + total);
                     break;
 
                 case 0:
@@ -213,11 +242,11 @@ public class Main {
     }
 
     // ==========================================================
-    // ======================= MENU VISITANTE ====================
+    // MENU VISITANTE
     // ==========================================================
     private static void menuVisitante(Scanner scanner,
                                       SalaRepository salaRepository,
-                                      SalaService salaService) {
+                                      ObraService obraService) {
 
         boolean salir = false;
 
@@ -226,29 +255,33 @@ public class Main {
             System.out.println("\n=== MENU VISITANTE ===");
             System.out.println("1. Ver salas");
             System.out.println("2. Ver obras por sala");
-            System.out.println("0. Salir");
+            System.out.println("0. Volver");
 
             int opcion = Integer.parseInt(scanner.nextLine());
 
             switch (opcion) {
 
                 case 1:
+
                     salaRepository.findAll()
                             .forEach(System.out::println);
+
                     break;
 
                 case 2:
+
                     System.out.print("ID Sala: ");
                     String idSala = scanner.nextLine();
 
                     List<ObraArte> obras =
-                            salaService.listarObrasPorSala(idSala);
+                            obraService.listarPorSala(idSala);
 
                     if (obras.isEmpty()) {
                         System.out.println("No hay obras en esta sala");
                     } else {
                         obras.forEach(System.out::println);
                     }
+
                     break;
 
                 case 0:
@@ -259,7 +292,7 @@ public class Main {
     }
 
     // ==========================================================
-    // ======================= MENU RESTAURADOR ==================
+    // MENU RESTAURADOR
     // ==========================================================
     private static void menuRestaurador(Scanner scanner,
                                         RestauracionService restauracionService) {
@@ -272,13 +305,14 @@ public class Main {
             System.out.println("1. Enviar obra a restauracion");
             System.out.println("2. Finalizar restauracion");
             System.out.println("3. Ver restauraciones de obra");
-            System.out.println("0. Salir");
+            System.out.println("0. Volver");
 
             int opcion = Integer.parseInt(scanner.nextLine());
 
             switch (opcion) {
 
                 case 1:
+
                     System.out.print("ID Obra: ");
                     String idObra = scanner.nextLine();
 
@@ -286,21 +320,57 @@ public class Main {
                     String tipo = scanner.nextLine();
 
                     restauracionService.enviarARestauracion(idObra, tipo);
+
                     break;
 
                 case 2:
+
                     System.out.print("ID Obra: ");
                     String idFinalizar = scanner.nextLine();
 
                     restauracionService.finalizarRestauracion(idFinalizar);
+
                     break;
 
                 case 3:
+
                     System.out.print("ID Obra: ");
                     String idConsulta = scanner.nextLine();
 
                     restauracionService
                             .obtenerRestauracionesOrdenadas(idConsulta)
+                            .forEach(System.out::println);
+
+                    break;
+
+                case 0:
+                    salir = true;
+                    break;
+            }
+        }
+    }
+
+    // ==========================================================
+    // MENU CATALOGADOR
+    // ==========================================================
+    private static void menuCatalogador(Scanner scanner,
+                                        ObraService obraService,
+                                        SalaRepository salaRepository) {
+
+        boolean salir = false;
+
+        while (!salir) {
+
+            System.out.println("\n=== MENU CATALOGADOR ===");
+            System.out.println("1. Listar obras");
+            System.out.println("0. Volver");
+
+            int opcion = Integer.parseInt(scanner.nextLine());
+
+            switch (opcion) {
+
+                case 1:
+                    obraService.listarTodas()
                             .forEach(System.out::println);
                     break;
 
