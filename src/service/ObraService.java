@@ -1,5 +1,6 @@
 package service;
 
+import model.EstadoObra;
 import model.ObraArte;
 import repository.ObraRepository;
 import repository.RestauracionRepository;
@@ -38,13 +39,42 @@ public class ObraService {
                 .sum();
     }
 
-    // NECESARIO PARA MENU VISITANTE
+    // =========================
+    // LISTAR OBRAS POR SALA
+    // =========================
+
     public List<ObraArte> listarPorSala(String idSala) {
 
         return obraRepository.listarTodas()
                 .stream()
                 .filter(o -> o.getSala() != null &&
                         o.getSala().getId().equals(idSala))
+                .collect(Collectors.toList());
+    }
+
+    // =========================
+    // BUSCAR OBRAS
+    // =========================
+
+    public List<ObraArte> buscarPorTitulo(String titulo) {
+
+        return obraRepository.listarTodas()
+                .stream()
+                .filter(o -> o.getTitulo()
+                        .toLowerCase()
+                        .contains(titulo.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    // =========================
+    // OBRAS EN RESTAURACION
+    // =========================
+
+    public List<ObraArte> obrasEnRestauracion() {
+
+        return obraRepository.listarTodas()
+                .stream()
+                .filter(o -> o.getEstado() == EstadoObra.EN_RESTAURACION)
                 .collect(Collectors.toList());
     }
 }

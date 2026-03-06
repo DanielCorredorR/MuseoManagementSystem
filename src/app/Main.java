@@ -119,7 +119,7 @@ public class Main {
                         break;
 
                     case RESTAURADOR:
-                        menuRestaurador(scanner, restauracionService);
+                        menuRestaurador(scanner,obraService, restauracionService);
                         break;
 
                     case CATALOGADOR:
@@ -294,7 +294,7 @@ public class Main {
     // ==========================================================
     // MENU RESTAURADOR
     // ==========================================================
-    private static void menuRestaurador(Scanner scanner,
+    private static void menuRestaurador(Scanner scanner,ObraService obraService,
                                         RestauracionService restauracionService) {
 
         boolean salir = false;
@@ -305,6 +305,7 @@ public class Main {
             System.out.println("1. Enviar obra a restauracion");
             System.out.println("2. Finalizar restauracion");
             System.out.println("3. Ver restauraciones de obra");
+            System.out.println("4. Ver obras en restauracion");
             System.out.println("0. Volver");
 
             int opcion = Integer.parseInt(scanner.nextLine());
@@ -342,7 +343,32 @@ public class Main {
                             .forEach(System.out::println);
 
                     break;
+                case 4:
 
+                     List<ObraArte> obras =
+                        obraService.obrasEnRestauracion();
+
+                    if(obras.isEmpty()){
+                    System.out.println("No hay obras en restauracion");
+                    break;
+                        }
+
+                    for(ObraArte obra : obras){
+                    
+                        System.out.println(obra);
+
+                        obra.getRestauraciones().forEach(r -> {
+
+                        System.out.println(
+                             "   Inicio: " + r.getFechaInicio()
+                            + " | Fin: " + r.getFechaFin()
+                        );
+
+                    });
+
+                    }
+
+                break;
                 case 0:
                     salir = true;
                     break;
@@ -350,34 +376,199 @@ public class Main {
         }
     }
 
-    // ==========================================================
-    // MENU CATALOGADOR
-    // ==========================================================
-    private static void menuCatalogador(Scanner scanner,
-                                        ObraService obraService,
-                                        SalaRepository salaRepository) {
+  // ==========================================================
+// MENU CATALOGADOR
+// ==========================================================
+private static void menuCatalogador(Scanner scanner,
+                                    ObraService obraService,
+                                    SalaRepository salaRepository) {
 
-        boolean salir = false;
+    boolean salir = false;
 
-        while (!salir) {
+    while (!salir) {
 
-            System.out.println("\n=== MENU CATALOGADOR ===");
-            System.out.println("1. Listar obras");
-            System.out.println("0. Volver");
+        System.out.println("\n=== MENU CATALOGADOR ===");
+        System.out.println("1. Registrar CUADRO");
+        System.out.println("2. Registrar ESCULTURA");
+        System.out.println("3. Registrar OBJETO");
+        System.out.println("4. Listar obras");
+        System.out.println("0. Volver");
 
-            int opcion = Integer.parseInt(scanner.nextLine());
+        int opcion = Integer.parseInt(scanner.nextLine());
 
-            switch (opcion) {
+        switch (opcion) {
 
-                case 1:
-                    obraService.listarTodas()
-                            .forEach(System.out::println);
-                    break;
+            // ==============================
+            // REGISTRAR CUADRO
+            // ==============================
+            case 1:
 
-                case 0:
-                    salir = true;
-                    break;
-            }
+                System.out.println("Registro de CUADRO");
+
+                System.out.print("Titulo: ");
+                String tituloC = scanner.nextLine();
+
+                System.out.print("Autor: ");
+                String autorC = scanner.nextLine();
+
+                System.out.print("Periodo: ");
+                String periodoC = scanner.nextLine();
+
+                System.out.print("Valor (USD): ");
+                double valorC = Double.parseDouble(scanner.nextLine());
+
+                System.out.print("Fecha creacion (YYYY-MM-DD): ");
+                java.time.LocalDate fechaCreacionC =
+                        java.time.LocalDate.parse(scanner.nextLine());
+
+                System.out.print("Fecha entrada museo (YYYY-MM-DD): ");
+                java.time.LocalDate fechaEntradaC =
+                        java.time.LocalDate.parse(scanner.nextLine());
+
+                System.out.print("Estilo: ");
+                String estilo = scanner.nextLine();
+
+                System.out.print("Tecnica: ");
+                String tecnica = scanner.nextLine();
+
+                model.Cuadro cuadro = new model.Cuadro(
+                        tituloC,
+                        autorC,
+                        periodoC,
+                        valorC,
+                        fechaCreacionC,
+                        fechaEntradaC,
+                        estilo,
+                        tecnica
+                );
+
+                obraService.registrarObra(cuadro);
+
+                System.out.println("CUADRO registrado con ID: " + cuadro.getId());
+                break;
+
+
+            // ==============================
+            // REGISTRAR ESCULTURA
+            // ==============================
+            case 2:
+
+                System.out.println("Registro de ESCULTURA");
+
+                System.out.print("Titulo: ");
+                String tituloE = scanner.nextLine();
+
+                System.out.print("Autor: ");
+                String autorE = scanner.nextLine();
+
+                System.out.print("Periodo: ");
+                String periodoE = scanner.nextLine();
+
+                System.out.print("Valor (USD): ");
+                double valorE = Double.parseDouble(scanner.nextLine());
+
+                System.out.print("Fecha creacion (YYYY-MM-DD): ");
+                java.time.LocalDate fechaCreacionE =
+                        java.time.LocalDate.parse(scanner.nextLine());
+
+                System.out.print("Fecha entrada museo (YYYY-MM-DD): ");
+                java.time.LocalDate fechaEntradaE =
+                        java.time.LocalDate.parse(scanner.nextLine());
+
+                System.out.print("Estilo: ");
+                String estiloE = scanner.nextLine();
+
+                System.out.print("Material: ");
+                String material = scanner.nextLine();
+
+                model.Escultura escultura = new model.Escultura(
+                        tituloE,
+                        autorE,
+                        periodoE,
+                        valorE,
+                        fechaCreacionE,
+                        fechaEntradaE,
+                        estiloE,
+                        material
+                );
+
+                obraService.registrarObra(escultura);
+
+                System.out.println("ESCULTURA registrada con ID: " + escultura.getId());
+                break;
+
+
+            // ==============================
+            // REGISTRAR OBJETO
+            // ==============================
+            case 3:
+
+                System.out.println("Registro de OBJETO");
+
+                System.out.print("Titulo: ");
+                String tituloO = scanner.nextLine();
+
+                System.out.print("Autor: ");
+                String autorO = scanner.nextLine();
+
+                System.out.print("Periodo: ");
+                String periodoO = scanner.nextLine();
+
+                System.out.print("Valor (USD): ");
+                double valorO = Double.parseDouble(scanner.nextLine());
+
+                System.out.print("Fecha creacion (YYYY-MM-DD): ");
+                java.time.LocalDate fechaCreacionO =
+                        java.time.LocalDate.parse(scanner.nextLine());
+
+                System.out.print("Fecha entrada museo (YYYY-MM-DD): ");
+                java.time.LocalDate fechaEntradaO =
+                        java.time.LocalDate.parse(scanner.nextLine());
+
+                model.Objeto objeto = new model.Objeto(
+                        tituloO,
+                        autorO,
+                        periodoO,
+                        valorO,
+                        fechaCreacionO,
+                        fechaEntradaO
+                );
+
+                obraService.registrarObra(objeto);
+
+                System.out.println("OBJETO registrado con ID: " + objeto.getId());
+                break;
+
+
+            // ==============================
+            // LISTAR OBRAS/BUSCAR
+            // ==============================
+            case 4:
+
+                obraService.listarTodas()
+                        .forEach(System.out::println);
+
+                break;
+            case 5:
+
+            System.out.print("Titulo de la obra a buscar: ");
+            String tituloBusqueda = scanner.nextLine();
+
+            List<ObraArte> resultados =
+                    obraService.buscarPorTitulo(tituloBusqueda);
+
+            if(resultados.isEmpty()){
+                System.out.println("No se encontraron obras");
+                    }else{
+                resultados.forEach(System.out::println);
+                }
+
+                break;
+
+            case 0:
+                salir = true;
+                break;
         }
     }
+}
 }

@@ -17,6 +17,7 @@ public abstract class ObraArte {
     private EstadoObra estado;
     private List<Restauracion> restauraciones;
     private Sala sala;
+
     public ObraArte(String titulo, String autor, String periodo,
                      double valor, LocalDate fechaCreacion, LocalDate fechaEntrada) {
 
@@ -62,13 +63,15 @@ public abstract class ObraArte {
     public EstadoObra getEstado() {
         return estado;
     }
+
     public Sala getSala() {
-    return sala;
+        return sala;
     }
 
     public void setSala(Sala sala) {
-    this.sala = sala;
+        this.sala = sala;
     }
+
     public void setEstado(EstadoObra estado) {
         this.estado = estado;
     }
@@ -83,7 +86,8 @@ public abstract class ObraArte {
 
     @Override
     public String toString() {
-        return "ID: " + id +
+        return "Tipo: " + getClass().getSimpleName() +
+                " | ID: " + id +
                 " | Titulo: " + titulo +
                 " | Autor: " + autor +
                 " | Estado: " + estado +
